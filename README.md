@@ -45,7 +45,7 @@ import (
 func main() {
 	server, err := grpcserver.New(
 		grpcserver.WithServerOptionName("testgrpc"),
-		grpcserver.WithServerOptionPost(8090), // default post 2345
+		grpcserver.WithServerOptionPost(8090),
 		grpcserver.WithServerRegisterServer(func(server *grpc.Server) {
 			// register your service
 			// userpb.RegisterUserServer(server, user.NewUserServer())
@@ -89,7 +89,7 @@ func main() {
 		httpserver.WithServerOptionName("testhttp"),
 		httpserver.WithServerHttpServer(
 			&http.Server{
-				Addr:    fmt.Sprintf(":%d", 8091), // default post 3939
+				Addr:    fmt.Sprintf(":%d", 8091),
 				Handler: r,
 			},
 		),
