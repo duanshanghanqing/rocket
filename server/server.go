@@ -1,11 +1,11 @@
 package server
 
 import (
+	"github.com/duanshanghanqing/rocket/registry"
 	"github.com/google/uuid"
 	"os"
 	"syscall"
 	"time"
-	"github.com/duanshanghanqing/rocket/registry"
 )
 
 type IServer interface {
@@ -20,7 +20,6 @@ type Option struct {
 	Signals               []os.Signal
 	ServiceRegisterCenter registry.IRegistrar
 	ServiceRegisterInfo   *registry.ServiceRegisterInfo
-	ServiceRegisterHost   string
 }
 
 func NewDefault() (*Option, error) {
@@ -29,11 +28,10 @@ func NewDefault() (*Option, error) {
 		return nil, err
 	}
 	return &Option{
-		ID:                  uid.String(),
-		Post:                2345,
-		Signals:             []os.Signal{syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT},
-		Timeout:             time.Second * 30, // 30 s
-		ServiceRegisterHost: "127.0.0.1",
+		ID:      uid.String(),
+		Post:    2345,
+		Signals: []os.Signal{syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT},
+		Timeout: time.Second * 30, // 30 s
 	}, nil
 }
 

@@ -2,6 +2,7 @@ package registrycenter
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/duanshanghanqing/rocket/registry"
 	consulApi "github.com/hashicorp/consul/api"
@@ -39,6 +40,9 @@ func NewConsulRegisterCenter(opts ...ConsulRegisterCenterOptions) (registry.IReg
 }
 
 func (r *ConsulRegisterCenter) Register(ctx context.Context, service *registry.ServiceRegisterInfo) error {
+	if service == nil {
+		return errors.New("ServiceRegisterInfo is nil")
+	}
 	// 1.Registration Service Information
 	reg := consulApi.AgentServiceRegistration{}
 	reg.ID = service.ID
@@ -68,5 +72,8 @@ func (r *ConsulRegisterCenter) Register(ctx context.Context, service *registry.S
 }
 
 func (r *ConsulRegisterCenter) Deregister(ctx context.Context, service *registry.ServiceRegisterInfo) error {
+	if service == nil {
+		return errors.New("ServiceRegisterInfo is nil")
+	}
 	return r.client.Agent().ServiceDeregister(service.ID) // Unregister service
 }

@@ -33,12 +33,6 @@ func WithServerOptionName(name string) ServerOption {
 	}
 }
 
-func WithServerOptionServiceRegisterHost(host string) ServerOption {
-	return func(s *Server) {
-		s.option.ServiceRegisterHost = host
-	}
-}
-
 func WithServerOptionPost(post int) ServerOption {
 	return func(s *Server) {
 		s.option.Post = post
@@ -161,11 +155,13 @@ func New(opts ...ServerOption) (server.IServer, error) {
 
 	_, post, _ := utils.AddressToHostPost(s.httpServer.Addr)
 	s.option.Post = post
-	s.option.ServiceRegisterInfo = &registry.ServiceRegisterInfo{
-		ID:   s.option.ID,
-		Name: s.option.Name,
-		Host: s.option.ServiceRegisterHost,
-		Port: post,
+	if s.option.ServiceRegisterInfo != nil {
+		if s.option.ServiceRegisterInfo.Host == "" {
+			return nil, errors.New("service register host cannot be empty")
+		}
+		s.option.ServiceRegisterInfo.ID = s.option.ID
+		s.option.ServiceRegisterInfo.Name = s.option.Name
+		s.option.ServiceRegisterInfo.Port = post
 	}
 
 	return s, nil
