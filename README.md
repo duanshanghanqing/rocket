@@ -10,6 +10,8 @@
 - etcd (todo)
 - nacos (todo)
 
+[examples](https://github.com/duanshanghanqing/rocket/examples)
+
 ## Getting rocket
 
 ### Prerequisites
@@ -31,20 +33,20 @@ Otherwise, run the following Go command to install the `rocket` package:
 $ go get -u github.com/duanshanghanqing/rocket
 ```
 
-### Run rocket grpc server
+### grpc server
 
 ```go
 package main
 
 import (
+	"github.com/duanshanghanqing/rocket/server/grpcserver"
 	"google.golang.org/grpc"
 	"log"
-	"github.com/duanshanghanqing/rocket/server/grpcserver"
 )
 
 func main() {
 	server, err := grpcserver.New(
-		grpcserver.WithServerOptionName("testgrpc"),
+		grpcserver.WithServerOptionName("grpc-server"),
 		grpcserver.WithServerOptionPost(8090),
 		grpcserver.WithServerRegisterServer(func(server *grpc.Server) {
 			// register your service
@@ -64,29 +66,29 @@ func main() {
 
 ```
 
-### Run rocket http server
+### http server
 
 ```go
 package main
 
 import (
 	"fmt"
+	"github.com/duanshanghanqing/rocket/server/httpserver"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
-	"github.com/duanshanghanqing/rocket/server/httpserver"
 )
 
 func main() {
 	r := gin.Default()
-	r.GET("/ping", func(c *gin.Context) {
+	r.GET("/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "pong",
 		})
 	})
-	
+
 	server, err := httpserver.New(
-		httpserver.WithServerOptionName("testhttp"),
+		httpserver.WithServerOptionName("http-server"),
 		httpserver.WithServerHttpServer(
 			&http.Server{
 				Addr:    fmt.Sprintf(":%d", 8091),
