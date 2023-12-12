@@ -3,8 +3,8 @@ package registrycenter
 import (
 	"context"
 	"fmt"
-	consulApi "github.com/hashicorp/consul/api"
 	"github.com/duanshanghanqing/rocket/registry"
+	consulApi "github.com/hashicorp/consul/api"
 )
 
 type ConsulRegisterCenter struct {
@@ -45,7 +45,7 @@ func (r *ConsulRegisterCenter) Register(ctx context.Context, service *registry.S
 	reg.Name = service.Name
 	reg.Address = service.Host
 	reg.Port = service.Port
-	reg.Tags = []string{fmt.Sprintf("%s:%d", reg.Address, reg.Port)}
+	reg.Tags = service.Tags
 
 	// 2.Set up health check ups
 	check := &consulApi.AgentServiceCheck{

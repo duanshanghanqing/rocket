@@ -4,6 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/duanshanghanqing/rocket/pkg/utils"
+	"github.com/duanshanghanqing/rocket/registry"
+	"github.com/duanshanghanqing/rocket/server"
+	"github.com/duanshanghanqing/rocket/server/grpcserver/interceptors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health/grpc_health_v1"
 	"log"
@@ -11,10 +15,6 @@ import (
 	"os"
 	"os/signal"
 	"time"
-	"github.com/duanshanghanqing/rocket/pkg/utils"
-	"github.com/duanshanghanqing/rocket/registry"
-	"github.com/duanshanghanqing/rocket/server"
-	"github.com/duanshanghanqing/rocket/server/grpcserver/interceptors"
 )
 
 type Server struct {

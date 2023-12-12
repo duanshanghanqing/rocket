@@ -4,14 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/duanshanghanqing/rocket/pkg/utils"
+	"github.com/duanshanghanqing/rocket/registry"
+	"github.com/duanshanghanqing/rocket/server"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"time"
-	"github.com/duanshanghanqing/rocket/pkg/utils"
-	"github.com/duanshanghanqing/rocket/registry"
-	"github.com/duanshanghanqing/rocket/server"
 )
 
 type Server struct {
