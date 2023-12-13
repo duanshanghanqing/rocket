@@ -2,7 +2,7 @@ package registry
 
 import "context"
 
-// Service registration interface
+// IRegistrar Service registration interface
 type IRegistrar interface {
 	Register(ctx context.Context, service *ServiceRegisterInfo) error
 	Deregister(ctx context.Context, service *ServiceRegisterInfo) error

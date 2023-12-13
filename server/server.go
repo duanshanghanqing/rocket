@@ -14,7 +14,6 @@ type IServer interface {
 
 type Option struct {
 	ID                    string
-	Name                  string
 	Post                  int
 	Timeout               time.Duration
 	Signals               []os.Signal

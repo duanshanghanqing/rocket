@@ -8,7 +8,6 @@ import (
 
 func main() {
 	server, err := grpcserver.New(
-		grpcserver.WithServerOptionName("grpc-server"),
 		grpcserver.WithServerOptionPost(8090),
 		grpcserver.WithServerRegisterServer(func(server *grpc.Server) {
 			// register your service

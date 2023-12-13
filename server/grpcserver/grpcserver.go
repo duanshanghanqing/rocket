@@ -35,12 +35,6 @@ func WithServerOptionID(id string) ServerOption {
 	}
 }
 
-func WithServerOptionName(name string) ServerOption {
-	return func(s *Server) {
-		s.option.Name = name
-	}
-}
-
 func WithServerOptionTimeout(timeout time.Duration) ServerOption {
 	return func(s *Server) {
 		s.option.Timeout = timeout
@@ -121,17 +115,15 @@ func New(opts ...ServerOption) (server.IServer, error) {
 		opt(s)
 	}
 
-	if s.option.Name == "" {
-		return nil, errors.New("service name cannot be empty")
-	}
-
 	// Set service registration information
 	if s.option.ServiceRegisterInfo != nil {
+		if s.option.ServiceRegisterInfo.Name == "" {
+			return nil, errors.New("service name cannot be empty")
+		}
 		if s.option.ServiceRegisterInfo.Host == "" {
 			return nil, errors.New("service register host cannot be empty")
 		}
 		s.option.ServiceRegisterInfo.ID = s.option.ID
-		s.option.ServiceRegisterInfo.Name = s.option.Name
 		s.option.ServiceRegisterInfo.Port = s.option.Post
 	}
 
@@ -206,7 +198,7 @@ func (s *Server) Run() error {
 		signalChan := make(chan os.Signal, 1)
 		signal.Notify(signalChan, s.option.Signals...) // This place will not block
 		err := fmt.Errorf("%s", <-signalChan)          // Block here, only execute downwards when receiving the above two signals, and retrieve the pipeline value
-		// 服务优雅退出
+		// Elegant service exit
 		if s.grpcServer != nil {
 			log.Println("grpc server stopping")
 			// Unregister service

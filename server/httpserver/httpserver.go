@@ -27,12 +27,6 @@ func WithServerOptionID(id string) ServerOption {
 	}
 }
 
-func WithServerOptionName(name string) ServerOption {
-	return func(s *Server) {
-		s.option.Name = name
-	}
-}
-
 func WithServerOptionPost(post int) ServerOption {
 	return func(s *Server) {
 		s.option.Post = post
@@ -143,10 +137,6 @@ func New(opts ...ServerOption) (server.IServer, error) {
 		opt(s)
 	}
 
-	if s.option.Name == "" {
-		return nil, errors.New("service name cannot be empty")
-	}
-
 	if s.httpServer == nil {
 		s.httpServer = &http.Server{
 			Addr: utils.HostPostToAddress("", s.option.Post),
@@ -156,11 +146,13 @@ func New(opts ...ServerOption) (server.IServer, error) {
 	_, post, _ := utils.AddressToHostPost(s.httpServer.Addr)
 	s.option.Post = post
 	if s.option.ServiceRegisterInfo != nil {
+		if s.option.ServiceRegisterInfo.Name == "" {
+			return nil, errors.New("service name cannot be empty")
+		}
 		if s.option.ServiceRegisterInfo.Host == "" {
 			return nil, errors.New("service register host cannot be empty")
 		}
 		s.option.ServiceRegisterInfo.ID = s.option.ID
-		s.option.ServiceRegisterInfo.Name = s.option.Name
 		s.option.ServiceRegisterInfo.Port = post
 	}
 

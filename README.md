@@ -9,6 +9,7 @@
 - consul
 - etcd (todo)
 - nacos (todo)
+- k8s (todo)
 
 [examples](https://github.com/duanshanghanqing/rocket/examples)
 
@@ -46,7 +47,6 @@ import (
 
 func main() {
 	server, err := grpcserver.New(
-		grpcserver.WithServerOptionName("grpc-server"),
 		grpcserver.WithServerOptionPost(8090),
 		grpcserver.WithServerRegisterServer(func(server *grpc.Server) {
 			// register your service
@@ -63,7 +63,6 @@ func main() {
 		log.Printf("err: %s", err.Error())
 	}
 }
-
 ```
 
 ### http server
@@ -88,7 +87,6 @@ func main() {
 	})
 
 	server, err := httpserver.New(
-		httpserver.WithServerOptionName("http-server"),
 		httpserver.WithServerHttpServer(
 			&http.Server{
 				Addr:    fmt.Sprintf(":%d", 8091),
@@ -96,6 +94,7 @@ func main() {
 			},
 		),
 	)
+
 	if err != nil {
 		log.Printf("err: %s", err.Error())
 		return
@@ -105,5 +104,4 @@ func main() {
 		log.Printf("err: %s", err.Error())
 	}
 }
-
 ```

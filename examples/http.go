@@ -17,7 +17,6 @@ func main() {
 	})
 
 	server, err := httpserver.New(
-		httpserver.WithServerOptionName("http-server"),
 		httpserver.WithServerHttpServer(
 			&http.Server{
 				Addr:    fmt.Sprintf(":%d", 8091),
@@ -25,6 +24,7 @@ func main() {
 			},
 		),
 	)
+
 	if err != nil {
 		log.Printf("err: %s", err.Error())
 		return

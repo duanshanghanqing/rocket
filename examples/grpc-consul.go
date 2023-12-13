@@ -29,7 +29,6 @@ func main() {
 	//}
 
 	server, err := grpcserver.New(
-		grpcserver.WithServerOptionName("grpc-server"),
 		grpcserver.WithServerOptionPost(8090),
 		grpcserver.WithServerRegisterServer(func(server *grpc.Server) {
 			// register your service
@@ -38,6 +37,7 @@ func main() {
 		// 设置注册中心
 		// Set up registration center
 		grpcserver.WithServerOptionServiceRegisterInfo(&registry.ServiceRegisterInfo{
+			Name: "grpc-server",
 			Host: "127.0.0.1", // local
 			//Host: externalIp, // external ip of cloud server
 			Tags: []string{"grpc-server", "8090"},

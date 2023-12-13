@@ -38,7 +38,6 @@ func main() {
 	//}
 
 	server, err := httpserver.New(
-		httpserver.WithServerOptionName("http-server"),
 		httpserver.WithServerHttpServer(
 			&http.Server{
 				Addr:    fmt.Sprintf(":%d", 8091),
@@ -47,6 +46,7 @@ func main() {
 		),
 		// Set up registration center
 		httpserver.WithServerOptionServiceRegisterInfo(&registry.ServiceRegisterInfo{
+			Name: "http-server",
 			Host: "127.0.0.1", // local
 			//Host: externalIp, // external ip of cloud server
 			Tags: []string{"http-server", "8091"},
