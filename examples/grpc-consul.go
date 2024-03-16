@@ -34,13 +34,12 @@ func main() {
 			// register your service
 			// userpb.RegisterUserServer(server, user.NewUserServer())
 		}),
-		// 设置注册中心
 		// Set up registration center
 		grpcserver.WithServerOptionServiceRegisterInfo(&registry.ServiceRegisterInfo{
 			Name: "grpc-server",
 			Host: "127.0.0.1", // local
 			//Host: externalIp, // external ip of cloud server
-			Tags: []string{"grpc-server", "8090"},
+			Tags: []string{"dev"},
 		}),
 		grpcserver.WithServerOptionServiceRegisterCenter(consulRegisterCenter),
 	)
