@@ -30,7 +30,7 @@ func NewDefault() (*Option, error) {
 		ID:      uid.String(),
 		Post:    2345,
 		Signals: []os.Signal{syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT},
-		Timeout: time.Second * 30, // 30 s
+		Timeout: time.Second * 60, // 60 s
 	}, nil
 }
 
