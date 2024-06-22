@@ -49,7 +49,7 @@ func main() {
 			Name: "http-server",
 			Host: "127.0.0.1", // local
 			//Host: externalIp, // external ip of cloud server
-			Tags: []string{"http-server", "8091"},
+			Tags: []string{"dev"},
 		}),
 		httpserver.WithServerOptionServiceRegisterCenter(consulRegisterCenter),
 	)
