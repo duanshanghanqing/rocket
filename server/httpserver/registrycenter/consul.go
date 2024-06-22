@@ -61,7 +61,6 @@ func (r *ConsulRegisterCenter) Register(ctx context.Context, service *registry.S
 
 	// 3.Add check
 	reg.Check = check
-	fmt.Println(reg.Check.HTTP)
 
 	// 4.Registration Services
 	err := r.client.Agent().ServiceRegister(&reg)
