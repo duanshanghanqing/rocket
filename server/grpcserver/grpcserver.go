@@ -2,7 +2,6 @@ package grpcserver
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"github.com/duanshanghanqing/rocket/pkg/utils"
 	"github.com/duanshanghanqing/rocket/registry"
@@ -29,12 +28,6 @@ type Server struct {
 
 type ServerOption func(s *Server)
 
-func WithServerOptionID(id string) ServerOption {
-	return func(s *Server) {
-		s.option.ID = id
-	}
-}
-
 func WithServerOptionTimeout(timeout time.Duration) ServerOption {
 	return func(s *Server) {
 		s.option.Timeout = timeout
@@ -43,19 +36,13 @@ func WithServerOptionTimeout(timeout time.Duration) ServerOption {
 
 func WithServerOptionSignal(signals []os.Signal) ServerOption {
 	return func(s *Server) {
-		s.option.Signals = signals
+		s.option.Signals = append(s.option.Signals, signals...)
 	}
 }
 
 func WithServerOptionServiceRegisterCenter(serviceRegisterCenter registry.IRegistrar) ServerOption {
 	return func(s *Server) {
 		s.option.ServiceRegisterCenter = serviceRegisterCenter
-	}
-}
-
-func WithServerOptionServiceRegisterInfo(serviceRegisterInfo *registry.ServiceRegisterInfo) ServerOption {
-	return func(s *Server) {
-		s.option.ServiceRegisterInfo = serviceRegisterInfo
 	}
 }
 
@@ -115,18 +102,6 @@ func New(opts ...ServerOption) (server.IServer, error) {
 		opt(s)
 	}
 
-	// Set service registration information
-	if s.option.ServiceRegisterInfo != nil {
-		if s.option.ServiceRegisterInfo.Name == "" {
-			return nil, errors.New("service name cannot be empty")
-		}
-		if s.option.ServiceRegisterInfo.Host == "" {
-			return nil, errors.New("service register host cannot be empty")
-		}
-		s.option.ServiceRegisterInfo.ID = s.option.ID
-		s.option.ServiceRegisterInfo.Port = s.option.Post
-	}
-
 	return s, nil
 }
 
@@ -172,10 +147,7 @@ func (s *Server) startGrpcServer() error {
 
 	// Service Registration Center, Registering GRPC Services
 	if s.option.ServiceRegisterCenter != nil { // Explain that the user has implemented the service registration center themselves
-		err = s.option.ServiceRegisterCenter.Register(context.Background(), s.option.ServiceRegisterInfo)
-		if err != nil {
-			return err
-		}
+		s.option.ServiceRegisterCenter.Register()
 	}
 
 	log.Printf("grpc server start: %s", lis.Addr())
@@ -203,7 +175,7 @@ func (s *Server) Run() error {
 			log.Println("grpc server stopping")
 			// Unregister service
 			if s.option.ServiceRegisterCenter != nil {
-				_ = s.option.ServiceRegisterCenter.Deregister(context.Background(), s.option.ServiceRegisterInfo)
+				s.option.ServiceRegisterCenter.Deregister()
 			}
 			// Elegant Exit
 			s.grpcServer.GracefulStop()

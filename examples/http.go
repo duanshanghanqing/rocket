@@ -24,7 +24,6 @@ func main() {
 			},
 		),
 	)
-
 	if err != nil {
 		log.Printf("err: %s", err.Error())
 		return

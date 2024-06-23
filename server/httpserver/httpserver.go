@@ -2,7 +2,6 @@ package httpserver
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"github.com/duanshanghanqing/rocket/pkg/utils"
 	"github.com/duanshanghanqing/rocket/registry"
@@ -21,12 +20,6 @@ type Server struct {
 
 type ServerOption func(s *Server)
 
-func WithServerOptionID(id string) ServerOption {
-	return func(s *Server) {
-		s.option.ID = id
-	}
-}
-
 func WithServerOptionPost(post int) ServerOption {
 	return func(s *Server) {
 		s.option.Post = post
@@ -41,19 +34,13 @@ func WithServerOptionTimeout(timeout time.Duration) ServerOption {
 
 func WithServerOptionSignal(signals []os.Signal) ServerOption {
 	return func(s *Server) {
-		s.option.Signals = signals
+		s.option.Signals = append(s.option.Signals, signals...)
 	}
 }
 
 func WithServerOptionServiceRegisterCenter(serviceRegisterCenter registry.IRegistrar) ServerOption {
 	return func(s *Server) {
 		s.option.ServiceRegisterCenter = serviceRegisterCenter
-	}
-}
-
-func WithServerOptionServiceRegisterInfo(serviceRegisterInfo *registry.ServiceRegisterInfo) ServerOption {
-	return func(s *Server) {
-		s.option.ServiceRegisterInfo = serviceRegisterInfo
 	}
 }
 
@@ -66,10 +53,7 @@ func WithServerHttpServer(httpServer *http.Server) ServerOption {
 func (s *Server) startHttpServer() error {
 	// 服务注册
 	if s.option.ServiceRegisterCenter != nil {
-		err := s.option.ServiceRegisterCenter.Register(context.Background(), s.option.ServiceRegisterInfo)
-		if err != nil {
-			return err
-		}
+		s.option.ServiceRegisterCenter.Register()
 	}
 
 	// When the user does not implement a handler, implement a default
@@ -96,7 +80,7 @@ func (s *Server) stopHttpServer() error {
 	log.Println("http server stopping")
 
 	if s.option.ServiceRegisterCenter != nil {
-		_ = s.option.ServiceRegisterCenter.Deregister(context.Background(), s.option.ServiceRegisterInfo)
+		s.option.ServiceRegisterCenter.Deregister()
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -145,16 +129,6 @@ func New(opts ...ServerOption) (server.IServer, error) {
 
 	_, post, _ := utils.AddressToHostPost(s.httpServer.Addr)
 	s.option.Post = post
-	if s.option.ServiceRegisterInfo != nil {
-		if s.option.ServiceRegisterInfo.Name == "" {
-			return nil, errors.New("service name cannot be empty")
-		}
-		if s.option.ServiceRegisterInfo.Host == "" {
-			return nil, errors.New("service register host cannot be empty")
-		}
-		s.option.ServiceRegisterInfo.ID = s.option.ID
-		s.option.ServiceRegisterInfo.Port = post
-	}
 
 	return s, nil
 }
