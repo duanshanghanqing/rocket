@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/duanshanghanqing/rocket/pkg/utils"
-	"github.com/duanshanghanqing/rocket/registry"
 	"github.com/duanshanghanqing/rocket/server"
 	"log"
 	"net/http"
@@ -38,22 +37,27 @@ func WithServerOptionSignal(signals []os.Signal) ServerOption {
 	}
 }
 
-func WithServerOptionServiceRegisterCenter(serviceRegisterCenter registry.IRegistrar) ServerOption {
-	return func(s *Server) {
-		s.option.ServiceRegisterCenter = serviceRegisterCenter
-	}
-}
-
 func WithServerHttpServer(httpServer *http.Server) ServerOption {
 	return func(s *Server) {
 		s.httpServer = httpServer
 	}
 }
 
+func WithServerOptionOnStart(onStart func()) ServerOption {
+	return func(s *Server) {
+		s.option.OnStart = onStart
+	}
+}
+
+func WithServerOptionOnStop(onStop func()) ServerOption {
+	return func(s *Server) {
+		s.option.OnStop = onStop
+	}
+}
+
 func (s *Server) startHttpServer() error {
-	// 服务注册
-	if s.option.ServiceRegisterCenter != nil {
-		s.option.ServiceRegisterCenter.Register()
+	if s.option.OnStart != nil {
+		s.option.OnStart()
 	}
 
 	// When the user does not implement a handler, implement a default
@@ -68,9 +72,7 @@ func (s *Server) startHttpServer() error {
 
 	log.Printf("http server start: %s", utils.HostPostToAddress("", s.option.Post))
 
-	err := s.httpServer.ListenAndServe()
-	time.Sleep(6 * time.Second)
-	return err
+	return s.httpServer.ListenAndServe()
 }
 
 func (s *Server) stopHttpServer() error {
@@ -79,8 +81,8 @@ func (s *Server) stopHttpServer() error {
 	err := fmt.Errorf("%s", <-signalChan)
 	log.Println("http server stopping")
 
-	if s.option.ServiceRegisterCenter != nil {
-		s.option.ServiceRegisterCenter.Deregister()
+	if s.option.OnStop != nil {
+		s.option.OnStop()
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)

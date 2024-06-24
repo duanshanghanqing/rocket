@@ -91,7 +91,12 @@ func main() {
 				Handler: r,
 			},
 		),
-		httpserver.WithServerOptionServiceRegisterCenter(consulRegisterCenter),
+		httpserver.WithServerOptionOnStart(func() {
+			consulRegisterCenter.Register()
+		}),
+		httpserver.WithServerOptionOnStop(func() {
+			consulRegisterCenter.Deregister()
+		}),
 	)
 	if err != nil {
 		log.Printf("err: %s", err.Error())

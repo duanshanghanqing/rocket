@@ -1,7 +1,6 @@
 package server
 
 import (
-	"github.com/duanshanghanqing/rocket/registry"
 	"os"
 	"syscall"
 	"time"
@@ -12,10 +11,11 @@ type IServer interface {
 }
 
 type Option struct {
-	Post                  int
-	Timeout               time.Duration
-	Signals               []os.Signal
-	ServiceRegisterCenter registry.IRegistrar
+	Post    int
+	Timeout time.Duration
+	Signals []os.Signal
+	OnStart func()
+	OnStop  func()
 }
 
 func NewDefault() (*Option, error) {

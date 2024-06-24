@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/duanshanghanqing/rocket/pkg/utils"
-	"github.com/duanshanghanqing/rocket/registry"
 	"github.com/duanshanghanqing/rocket/server"
 	"github.com/duanshanghanqing/rocket/server/grpcserver/interceptors"
 	"google.golang.org/grpc"
@@ -37,12 +36,6 @@ func WithServerOptionTimeout(timeout time.Duration) ServerOption {
 func WithServerOptionSignal(signals []os.Signal) ServerOption {
 	return func(s *Server) {
 		s.option.Signals = append(s.option.Signals, signals...)
-	}
-}
-
-func WithServerOptionServiceRegisterCenter(serviceRegisterCenter registry.IRegistrar) ServerOption {
-	return func(s *Server) {
-		s.option.ServiceRegisterCenter = serviceRegisterCenter
 	}
 }
 
@@ -79,6 +72,18 @@ func WithServerHealthServer(healthServer grpc_health_v1.HealthServer) ServerOpti
 func WithServerRegisterServer(registerServer func(server *grpc.Server)) ServerOption {
 	return func(s *Server) {
 		s.registerServer = registerServer
+	}
+}
+
+func WithServerOptionOnStart(onStart func()) ServerOption {
+	return func(s *Server) {
+		s.option.OnStart = onStart
+	}
+}
+
+func WithServerOptionOnStop(onStop func()) ServerOption {
+	return func(s *Server) {
+		s.option.OnStop = onStop
 	}
 }
 
@@ -146,8 +151,8 @@ func (s *Server) startGrpcServer() error {
 	s.registerServer(s.grpcServer)
 
 	// Service Registration Center, Registering GRPC Services
-	if s.option.ServiceRegisterCenter != nil { // Explain that the user has implemented the service registration center themselves
-		s.option.ServiceRegisterCenter.Register()
+	if s.option.OnStart != nil { // Explain that the user has implemented the service registration center themselves
+		s.option.OnStart()
 	}
 
 	log.Printf("grpc server start: %s", lis.Addr())
@@ -174,8 +179,8 @@ func (s *Server) Run() error {
 		if s.grpcServer != nil {
 			log.Println("grpc server stopping")
 			// Unregister service
-			if s.option.ServiceRegisterCenter != nil {
-				s.option.ServiceRegisterCenter.Deregister()
+			if s.option.OnStop != nil {
+				s.option.OnStop()
 			}
 			// Elegant Exit
 			s.grpcServer.GracefulStop()

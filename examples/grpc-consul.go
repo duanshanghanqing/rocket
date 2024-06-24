@@ -80,7 +80,12 @@ func main() {
 			// register your service
 			// userpb.RegisterUserServer(server, user.NewUserServer())
 		}),
-		grpcserver.WithServerOptionServiceRegisterCenter(consulRegisterCenter),
+		grpcserver.WithServerOptionOnStart(func() {
+			consulRegisterCenter.Register()
+		}),
+		grpcserver.WithServerOptionOnStop(func() {
+			consulRegisterCenter.Deregister()
+		}),
 	)
 
 	if err != nil {
